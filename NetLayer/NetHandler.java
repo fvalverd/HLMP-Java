@@ -281,6 +281,8 @@ public class NetHandler implements WifiInformationHandler, ResetIpHandler{
 	                
 	                while (wifiHandler.getConnectionState() == WifiConnectionState.STOP) {
 	                	debug("NETHANDLER: waiting request to AdHoc...");
+	                	Thread.sleep(1000);
+	                	debug("NETHANDLER: waiting request to AdHoc...");
 	                }
 	                
 	                // Wait for connect
@@ -291,6 +293,7 @@ public class NetHandler implements WifiInformationHandler, ResetIpHandler{
 	                		return;
 	                	}
 	                	Thread.sleep(1000);
+	                	debug("wifiHandler.state=" + wifiHandler.getConnectionState());
 	                }
 	                debug("wifiHandler.state=" + wifiHandler.getConnectionState());
 	                netData.setIpTcpListener(wifiHandler.getInetAddress());
@@ -444,27 +447,6 @@ public class NetHandler implements WifiInformationHandler, ResetIpHandler{
         // Close TCP
         try
         {
-        	debug("NETHANDLER: stop TCP listener...");
-            tcpListener.close();
-            debug("NETHANDLER: stop TCP listener... OK");
-        }
-        catch (Exception e)
-        {
-        	debug("NETHANDLER: stop TCP listener... failed! " + e.getMessage());
-        }
-        try
-        {
-        	debug("NETHANDLER: stop TCP thread...");
-            tcpListenerThread.interrupt();
-            tcpListenerThread.join();
-            debug("NETHANDLER: stop TCP thread... OK");
-        }
-        catch (Exception e)
-        {
-        	debug("NETHANDLER: stop TCP thread... failed! " + e.getMessage());
-        }
-        try
-        {
         	debug("NETHANDLER: kill TCP links...");
             RemoteMachine[] serverRemoteMachines = tcpServerList.toObjectArray();
             for (int i = 0; i < serverRemoteMachines.length; i++)
@@ -510,6 +492,29 @@ public class NetHandler implements WifiInformationHandler, ResetIpHandler{
         {
         	debug("NETHANDLER: kill TCP links... failed! " + e.getMessage());
         }
+        
+        try
+        {
+        	debug("NETHANDLER: stop TCP listener...");
+            tcpListener.close();
+            debug("NETHANDLER: stop TCP listener... OK");
+        }
+        catch (Exception e)
+        {
+        	debug("NETHANDLER: stop TCP listener... failed! " + e.getMessage());
+        }
+        try
+        {
+        	debug("NETHANDLER: stop TCP thread...");
+            tcpListenerThread.interrupt();
+            tcpListenerThread.join();
+            debug("NETHANDLER: stop TCP thread... OK");
+        }
+        catch (Exception e)
+        {
+        	debug("NETHANDLER: stop TCP thread... failed! " + e.getMessage());
+        }
+        
         
         // Restart Objects
         try
