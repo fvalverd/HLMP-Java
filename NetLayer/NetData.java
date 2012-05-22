@@ -1,8 +1,6 @@
 package hlmp.NetLayer;
 
 import java.net.InetAddress;
-//import java.net.UnknownHostException;
-//import java.util.Random;
 
 import hlmp.NetLayer.Constants.OpSystemType;
 

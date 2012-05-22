@@ -11,8 +11,6 @@ import java.net.SocketTimeoutException;
 import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import android.os.Looper;
-
 import hlmp.NetLayer.Constants.NetHandlerState;
 import hlmp.NetLayer.Constants.WifiConnectionState;
 import hlmp.NetLayer.Interfaces.ResetIpHandler;
@@ -124,7 +122,6 @@ public class NetHandler implements WifiInformationHandler, ResetIpHandler{
 		this.connectLock = new Object();
 		this.resetLock = new Object();
 		this.iphandlerPoint = new AtomicInteger(0);
-//		netData.pickNewIp();
 		init();
 		this.myself = this;
 	}
@@ -257,7 +254,6 @@ public class NetHandler implements WifiInformationHandler, ResetIpHandler{
 
 			@Override
 			public void run() {
-				Looper.prepare();
 				try
 	            {
 	                debug("NETHANDLER: start netHandler...");
@@ -514,7 +510,6 @@ public class NetHandler implements WifiInformationHandler, ResetIpHandler{
         {
         	debug("NETHANDLER: kill TCP links... failed! " + e.getMessage());
         }
-        
         
         // Restart Objects
         try
