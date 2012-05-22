@@ -290,6 +290,8 @@ public class NetHandler implements WifiInformationHandler, ResetIpHandler{
 	                	debug("wifiHandler.state=" + wifiHandler.getConnectionState());
 	                	if (wifiHandler.getConnectionState() == WifiConnectionState.FAILED || wifiHandler.getConnectionState() == WifiConnectionState.STOP) {
 	                		debug("NETHANDLER: start netHandler... FAILED!");
+	                		netHandlerState = NetHandlerState.STOPFORCED;
+	                		commHandler.stopNetworkingHandler();
 	                		return;
 	                	}
 	                	Thread.sleep(1000);
