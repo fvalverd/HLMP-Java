@@ -368,7 +368,7 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
         synchronized (eventConsumerLock) {
         	eventConsumer.start();
             eventConsumerStarted = true;
-            debug("COMMUNICATION: EventConsumer started");
+            log("COMMUNICATION: EventConsumer started");
 		}
     }
 
@@ -379,6 +379,11 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
     {
         synchronized (eventConsumerLock)
         {
+        	while(!eventQueuePC.isEmpty()) {
+        		try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {}
+        	}
             eventConsumerStarted = false;
             try
             {
@@ -556,22 +561,17 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
     {
         try
         {
-        	debug("COMMUNICATION: disconnect");
+        	log("COMMUNICATION: disconnect");
         	produceEvent(CommunicationEvent.DISCONNECTING, null);
         	netHandler.disconnect();
         	produceEvent(CommunicationEvent.DISCONNECT, null);
-        	debug("COMMUNICATION: disconnect... OK");
+        	log("COMMUNICATION: disconnect... OK");
         }
         catch (Exception e)
         {
             produceEvent(CommunicationEvent.EXCEPTION, e);
         }
     }
-
-	private void debug(String text) {
-//		produceEvent(CommunicationEvent.NETINFORMATION, text);
-    	System.out.println(text);
-	}
 
 	/**
      * Inicia el proceso de desconección a la MANET
@@ -607,24 +607,24 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
     {
         try
         {
-            debug("COMMUNICATION: start communication...");
-            debug("COMMUNICATION: set IP");
+            log("COMMUNICATION: start communication...");
+            log("COMMUNICATION: set IP");
             configuration.getNetUser().setIp(netHandler.getNetData().getIpTcpListener());
-            debug("COMMUNICATION: set user ID");
+            log("COMMUNICATION: set user ID");
             configuration.getNetUser().pickNewId();
-            debug("COMMUNICATION: router config");
+            log("COMMUNICATION: router config");
             updateRouter();
-            debug("COMMUNICATION: timer on");
+            log("COMMUNICATION: timer on");
             timerStart();
-            debug("COMMUNICATION: detection on");
+            log("COMMUNICATION: detection on");
             udpThread.start();
-            debug("COMMUNICATION: process on");
+            log("COMMUNICATION: process on");
             tcpThread.start();
-            debug("COMMUNICATION: messages on");
+            log("COMMUNICATION: messages on");
             messageThread.start();
-            debug("COMMUNICATION: bag on");
+            log("COMMUNICATION: bag on");
             bagStart();
-            debug("COMMUNICATION: start communication... ok!");
+            log("COMMUNICATION: start communication... ok!");
             produceEvent(CommunicationEvent.CONNECT, null);
         }
 //            catch (InterruptedException e)
@@ -633,7 +633,7 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
 //            }
         catch (Exception e)
         {
-            debug("COMMUNICATION: start communication... failed! " + e.getMessage());
+            log("COMMUNICATION: start communication... failed! " + e.getMessage());
         }
     }
 
@@ -645,10 +645,10 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
     {
         if (stopPoint.compareAndSet(0, 1))
         {
-            debug("COMMUNICATION: stop Communication...");
+            log("COMMUNICATION: stop Communication...");
             try
             {
-            	debug("COMMUNICATION: timer off...");
+            	log("COMMUNICATION: timer off...");
                 timer.cancel();
 				try
 				{
@@ -670,20 +670,20 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
                         timeOut++;
                         if (timeOut > configuration.getNetData().getWaitForTimerClose())
                         {
-                        	debug("COMMUNICATION WARNING: impossible to wait for timer");
+                        	log("COMMUNICATION WARNING: impossible to wait for timer");
                             break;
                         }
                     }
                 }
-				debug("COMMUNICATION: timer off... OK");
+				log("COMMUNICATION: timer off... OK");
             }
             catch (Exception e)
             {
-            	debug("COMMUNICATION: timer off error " + e.getMessage());
+            	log("COMMUNICATION: timer off error " + e.getMessage());
             }
             try
             {
-            	debug("COMMUNICATION: messages off...");
+            	log("COMMUNICATION: messages off...");
                 messageThread.interrupt();
                 try
                 {
@@ -699,15 +699,15 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
                 catch (Exception e)
                 {
                 }
-                debug("COMMUNICATION: messages off... OK");
+                log("COMMUNICATION: messages off... OK");
             }
             catch (Exception e)
             {
-            	debug("COMMUNICATION: messages off error " + e.getMessage());
+            	log("COMMUNICATION: messages off error " + e.getMessage());
             }
             try
             {
-            	debug("COMMUNICATION: detection off...");
+            	log("COMMUNICATION: detection off...");
                 try
                 {
                     udpThread.interrupt();
@@ -729,15 +729,15 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
                 catch (Exception e)
                 {
                 }
-                debug("COMMUNICATION: detection off... OK");
+                log("COMMUNICATION: detection off... OK");
             }
             catch (Exception e)
             {
-            	debug("COMMUNICATION: detection off error " + e.getMessage());
+            	log("COMMUNICATION: detection off error " + e.getMessage());
             }
             try
             {
-            	debug("COMMUNICATION: process off...");
+            	log("COMMUNICATION: process off...");
                 try
                 {
                     tcpThread.interrupt();
@@ -759,15 +759,15 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
                 catch (Exception e)
                 {
                 }
-                debug("COMMUNICATION: process off... OK");
+                log("COMMUNICATION: process off... OK");
             }
             catch (Exception e)
             {
-            	debug("COMMUNICATION: process off error " + e.getMessage());
+            	log("COMMUNICATION: process off error " + e.getMessage());
             }
             try
             {
-            	debug("COMMUNICATION: bag off...");
+            	log("COMMUNICATION: bag off...");
                 bag.cancel();
                 try
                 {
@@ -786,22 +786,22 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
                         timeOut++;
                         if (timeOut > configuration.getNetData().getWaitForTimerClose())
                         {
-                        	debug("COMMUNUCATION WARNING: impossible to wait for bag");
+                        	log("COMMUNUCATION WARNING: impossible to wait for bag");
                             break;
                         }
                     }
                 }
                 
-                debug("COMMUNICATION: bag off... OK");
+                log("COMMUNICATION: bag off... OK");
             }
             catch (Exception e)
             {
-            	debug("COMMUNICATION: bag off error " + e.getMessage());
+            	log("COMMUNICATION: bag off error " + e.getMessage());
             }
 
             try
             {
-                debug(
+                log(
                     "COMMUNICATION: messages stats " + "\n" +
                     " send: " + router.getNMessagesSent() + "\n" +
                     " confirmed: " + router.getNMessagesConfirmed() + "\n" +
@@ -815,19 +815,19 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
             }
             catch (Exception e)
             {
-            	debug("COMMUNICATION: messages stats error " + e.getMessage());
+            	log("COMMUNICATION: messages stats error " + e.getMessage());
             }
             try
             {
-            	debug("COMMUNICATION: init vars...");
+            	log("COMMUNICATION: init vars...");
             	init();
-            	debug("COMMUNICATION: init vars... OK");
+            	log("COMMUNICATION: init vars... OK");
             }
             catch (Exception e)
             {
-            	debug("COMMUNICATION: init vars error " + e.getMessage());
+            	log("COMMUNICATION: init vars error " + e.getMessage());
             }
-            debug("COMMUNICATION: stop communication... ok!");
+            log("COMMUNICATION: stop communication... ok!");
             stopPoint.set(0);
         }
     }
@@ -848,7 +848,7 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
      */
     public void errorNetworkingHandler(Exception e)
     {
-        debug("COMMUNICATION: network error" + e.getMessage());
+        log("COMMUNICATION: network error" + e.getMessage());
         Thread disconnectThread = new Thread(){
         	public void run(){
         		disconnect();
@@ -866,7 +866,7 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
     public void informationNetworkingHandler(String message)
     {
 //        produceEvent(CommunicationEvent.NETINFORMATION, message);
-    	this.debug(message);
+    	this.log(message);
     }
 
     /**
@@ -1087,8 +1087,7 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
     	return t;
     }
 
-
-
+    
     /**
      * Actualiza el estado de la comunicación (tráfico)
      */
@@ -1114,7 +1113,7 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
     private void updateRouter()
     {
         router.updateRouterTable(netHandler, configuration.getNetUser(), netUserList);
-        debug("ROUTER: max list size: " + router.getMaxListSize() + " used: " + router.getListSize());
+        log("ROUTER: max list size: " + router.getMaxListSize() + " used: " + router.getListSize());
     }
 
     /**
@@ -1212,7 +1211,7 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
                 {
                     produceEvent(CommunicationEvent.REFRESHUSER, newNetUser);
                 }
-                debug("COMMUNICATION: [" + netUser.getName() + "] connected");
+                log("COMMUNICATION: [" + netUser.getName() + "] connected");
                 // Agregado por NM
                 netHandler.connectTo(netUser.getIp().getHostAddress());
             }
@@ -1230,7 +1229,7 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
             netUserList.remove(netUser.getIp());
             produceEvent(CommunicationEvent.REMOVEUSER, netUser);
             netHandler.disconnectFrom(netUser.getIp());
-            debug("COMMUNICATION: [" + netUser.getName() + "] disconnected");
+            log("COMMUNICATION: [" + netUser.getName() + "] disconnected");
         }
     }
 
@@ -1302,7 +1301,7 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
                     {
                         produceEvent(CommunicationEvent.PROCESSMESSAGE, message);
                     }
-                    debug("COMMUNICATION: message received: " + message.toString());
+                    log("COMMUNICATION: message received: " + message.toString());
                 }
                 else
                 {
@@ -1320,7 +1319,7 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
                     {
                         produceEvent(CommunicationEvent.PROCESSMESSAGE, message);
                     }
-                    debug("COMMUNICATION: unknown message received: " + message.toString());
+                    log("COMMUNICATION: unknown message received: " + message.toString());
                 }
             }
         }
@@ -1337,13 +1336,13 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
         if (message.getType() == MessageType.IMALIVE)
         {
             ImAliveMessage imAliveMessage = (ImAliveMessage)message;
-            debug("ROUTER: message delivery fail " + imAliveMessage.toString());
+            log("ROUTER: message delivery fail " + imAliveMessage.toString());
         }
         //AckMessage
         else if (message.getType() == MessageType.ACK)
         {
             AckMessage ackMessage = (AckMessage)message;
-            debug("ROUTER: message delivery fail " + ackMessage.toString());
+            log("ROUTER: message delivery fail " + ackMessage.toString());
         }
         //Resto de los mensajes
         else
@@ -1361,7 +1360,7 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
             {
                 produceEvent(CommunicationEvent.ERRORMESSAGE, message);
             }
-            debug("ROUTER: message delivery fail " + message.toString());
+            log("ROUTER: message delivery fail " + message.toString());
         }
     }
 
@@ -1375,13 +1374,13 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
         if (message.getType() == MessageType.IMALIVE)
         {
             ImAliveMessage imAliveMessage = (ImAliveMessage)message;
-            debug("COMMUNICATION WARNING: reserved kind of message " + imAliveMessage.toString());
+            log("COMMUNICATION WARNING: reserved kind of message " + imAliveMessage.toString());
         }
         //AckMessage
         else if (message.getType() == MessageType.ACK)
         {
             AckMessage ackMessage = (AckMessage)message;
-            debug("COMMUNICATION WARNING: reserved kind of message " + ackMessage.toString());
+            log("COMMUNICATION WARNING: reserved kind of message " + ackMessage.toString());
         }
         //Resto de los mensajes
         else
@@ -1404,17 +1403,20 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
                 router.queueMessageToSend(message);
                 if (message.getType() != MessageType.IMALIVE && message.getType() != MessageType.ACK)
                 {
-                    debug("COMMUNICATION: queued " + message.toString());
+                    log("COMMUNICATION: queued " + message.toString());
                 }
             }
         }
         catch (Exception e)
         {
         	e.printStackTrace();
-            debug("COMMUNICATION: impossible to send this message " + e.getMessage());
+            log("COMMUNICATION: impossible to send this message " + e.getMessage());
         }
     }
     
+    private void log(String text) {
+		produceEvent(CommunicationEvent.NETINFORMATION, text);
+	}
     
     
     /** Interfaz de observers para todos los eventos **/

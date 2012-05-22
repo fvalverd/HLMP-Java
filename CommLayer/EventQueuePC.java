@@ -63,4 +63,8 @@ public class EventQueuePC {
         this.itemCount = -1;
 		notify();
 	}
+
+	public boolean isEmpty(){
+		return queue.isEmpty();
+	}
 }
