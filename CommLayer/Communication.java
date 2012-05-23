@@ -1,5 +1,6 @@
 package hlmp.CommLayer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -1130,6 +1131,14 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
             if (netUsers[i].getTimeout() < 0)
             {
                 disconnectNetUser(netUsers[i]);
+                try {
+					netHandler.getTcpServerList().getRemoteMachine(netUsers[i].getIp()).close();
+				}
+                catch (InterruptedException e) {
+				}
+                catch (IOException e) {
+				}
+                
             }
             else
             {
