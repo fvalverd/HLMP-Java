@@ -1,8 +1,9 @@
 package hlmp.Tools;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
+//import java.nio.charset.Charset;
 import java.util.UUID;
 
 public class BitConverter {
@@ -65,10 +66,20 @@ public class BitConverter {
  	}
 	
 	public static final byte[] stringToByte(String s) {
-		return s.getBytes(Charset.forName("UTF-16LE"));
+//		return s.getBytes(Charset.forName("UTF-16LE"));
+		try {
+			return s.getBytes("UTF-16LE");
+		} catch (UnsupportedEncodingException e) {
+			return null;
+		}
 	}
 	
 	public static final String byteToString(byte[] b) {
-		return new String(b, Charset.forName("UTF-16LE"));
+//		return new String(b, Charset.forName("UTF-16LE"));
+		try {
+			return new String(b, "UTF-16LE");
+		} catch (UnsupportedEncodingException e) {
+			return null;
+		}
 	}
 }
