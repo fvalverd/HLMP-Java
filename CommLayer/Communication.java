@@ -353,6 +353,7 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
 		timer = new Timer();
 		timer.schedule(getCommunicationTimerTask(), 0, configuration.getNetData().getTimeIntervalTimer());
 	}
+	
 	/**
 	 * Inicializa el bag
 	 */

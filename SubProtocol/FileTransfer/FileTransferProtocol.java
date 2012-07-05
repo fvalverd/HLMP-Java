@@ -10,6 +10,10 @@ import hlmp.CommLayer.MessageTypeList;
 import hlmp.CommLayer.NetUser;
 import hlmp.CommLayer.SubProtocol;
 import hlmp.CommLayer.Messages.Message;
+import hlmp.CommLayer.Observers.AddUserEventObserverI;
+import hlmp.CommLayer.Observers.ConnectEventObserverI;
+import hlmp.CommLayer.Observers.DisconnectEventObserverI;
+import hlmp.CommLayer.Observers.ReconnectingEventObserverI;
 import hlmp.SubProtocol.FileTransfer.Constants.FileMessageHandlerState;
 import hlmp.SubProtocol.FileTransfer.Constants.FileTransferProtocolType;
 import hlmp.SubProtocol.FileTransfer.ControlI.FileHandlerI;
@@ -23,7 +27,7 @@ import hlmp.SubProtocol.FileTransfer.Messages.FileRequestMessage;
 import hlmp.SubProtocol.FileTransfer.Messages.FileWaitMessage;
 
 
-public class FileTransferProtocol extends SubProtocol {
+public class FileTransferProtocol extends SubProtocol implements AddUserEventObserverI, ConnectEventObserverI, DisconnectEventObserverI, ReconnectingEventObserverI {
 
 	public FileHandlerI controlFileHandler;
 	public FileListHandlerI controlFileListHandler;
@@ -58,6 +62,7 @@ public class FileTransferProtocol extends SubProtocol {
 	}
 
 
+	// Concurrent Event process
 
 	private TimerTask getFileTransferTimerTask(){
     	TimerTask t = new TimerTask() {
@@ -294,20 +299,6 @@ public class FileTransferProtocol extends SubProtocol {
 		timer.schedule(getFileTransferTimerTask(), 0, fileData.getTimeIntervalTimer());
 	}
 
-	/// <summary>
-	/// Se gatilla cuando se quiere env�ar un mensaje
-	/// Este parametro es para asignar a los handlers
-	/// </summary>
-	/// <param name="message">El mensaje a enviar</param>
-//	internal void sendMessageDelegate(Message message)
-//	{
-//		this.sendMessageEvent(message);
-//	}
-
-	/// <summary>
-	/// Obtiene la lista de tipos de mensajes usados por este protocolo
-	/// </summary>
-	/// <returns>Una tabla con valores y tipos de mensajes usados en el protocolo</returns>
 	public MessageTypeList getMessageTypes() {
 		MessageTypeList typeCollection = new MessageTypeList();
 		typeCollection.add(FileTransferProtocolType.FILECOMPLETEMESSAGE, new FileCompleteMessage());
@@ -320,9 +311,6 @@ public class FileTransferProtocol extends SubProtocol {
 		return typeCollection;
 	}
 
-	/// <summary>
-	/// Procesa el archivos en proceso de descarga
-	/// </summary>
 	private void processFiles() throws InterruptedException {
 		if (fileMessageHandlerPoint.compareAndSet(0, 1)) {
 			synchronized (fileMessageHandlerLock) {
@@ -369,14 +357,6 @@ public class FileTransferProtocol extends SubProtocol {
 			}
 
 			synchronized (fileMessageHandlerLock) {
-//				FileMessageHandler[] handlers = new FileMessageHandler[activeUploads.size()];
-//				IDictionaryEnumerator en = activeUploads.GetEnumerator();
-//				int i = 0;
-//				while (en.MoveNext()) {
-//					handlers[i] = (FileMessageHandler)en.Value;
-//					i++;
-//				}
-//				for (FileMessageHandler fileMessageHandler : handlers) {
 				for (FileMessageHandler fileMessageHandler : activeUploads.values()) {
 					switch (fileMessageHandler.getState()) {
 						case FileMessageHandlerState.WAITING: {
@@ -431,5 +411,29 @@ public class FileTransferProtocol extends SubProtocol {
 			}
 			fileMessageHandlerPoint.set(0);
 		}
+	}
+
+	
+	
+	// HLMP Communication observer event
+	
+	@Override
+	public void reconnectingEventUpdate() {
+		this.stop();
+	}
+
+	@Override
+	public void disconnectEventUpdate() {
+		this.stop();
+	}
+
+	@Override
+	public void connectEventUpdate() {
+		this.start();
+	}
+
+	@Override
+	public void addUserEventUpdate(NetUser netUser) {
+		this.sendFileListRequest(netUser);		
 	}
 }
