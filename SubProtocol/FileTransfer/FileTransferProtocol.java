@@ -417,22 +417,18 @@ public class FileTransferProtocol extends SubProtocol implements AddUserEventObs
 	
 	// HLMP Communication observer event
 	
-	@Override
 	public void reconnectingEventUpdate() {
 		this.stop();
 	}
 
-	@Override
 	public void disconnectEventUpdate() {
 		this.stop();
 	}
 
-	@Override
 	public void connectEventUpdate() {
 		this.start();
 	}
 
-	@Override
 	public void addUserEventUpdate(NetUser netUser) {
 		this.sendFileListRequest(netUser);		
 	}
