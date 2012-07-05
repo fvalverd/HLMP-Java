@@ -1,6 +1,7 @@
 package hlmp.CommLayer.Messages;
 
-import java.nio.charset.Charset;
+import java.io.UnsupportedEncodingException;
+//import java.nio.charset.Charset;
 import java.util.UUID;
 
 import hlmp.CommLayer.Constants.*;
@@ -20,7 +21,13 @@ public class ImAliveMessage extends MulticastMessage {
 	@Override
 	public byte[] makePack() {
 		
-        byte[] userName = this.senderNetUser.getName().getBytes(Charset.forName("UTF-8"));//userNameSize (4 - userNameSize + 3)
+        //byte[] userName = this.senderNetUser.getName().getBytes(Charset.forName("UTF-8"));//userNameSize (4 - userNameSize + 3)
+        byte[] userName = null;
+		try {
+			userName = this.senderNetUser.getName().getBytes("UTF-8"); //userNameSize (4 - userNameSize + 3)
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
         byte[] userNameSize = BitConverter.intToByteArray(userName.length); //4 (0 - 3)
         
         byte[] userNeighborhoodSize = BitConverter.intToByteArray(this.senderNetUser.getNeighborhoodIds().length);//4 (userNameSize + 4 - userNameSize + 7)
@@ -47,7 +54,12 @@ public class ImAliveMessage extends MulticastMessage {
 	@Override
 	public void unPack(byte[] messagePack) {
 		int userNameSize = BitConverter.readInt(messagePack, 0);
-        this.senderNetUser.setName(new String(messagePack, 4, userNameSize, Charset.forName("UTF-8")));
+        //this.senderNetUser.setName(new String(messagePack, 4, userNameSize, Charset.forName("UTF-8")));
+		try {
+			this.senderNetUser.setName(new String(messagePack, 4, userNameSize, "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
         int userNeighborhoodSize = BitConverter.readInt(messagePack, userNameSize + 4);
         this.senderNetUser.setNeighborhoodIds(new UUID[userNeighborhoodSize]);
         for (int i = 0; i < userNeighborhoodSize; i++)
