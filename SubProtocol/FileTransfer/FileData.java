@@ -17,13 +17,14 @@ public class FileData {
     
     public FileData(ManageDirectory md) {
         this.partSize = 1024 * 1024 / 8;
-        this.downloadDir = md.createDownloadDir();
         this.fileTimeOut = 10;
         this.fileRiseUp = 5;
         this.timeIntervalTimer = 1000;
         this.simulteneusUpload = 1;
         this.simulteneusDownload = 1;
         this.fileList = new FileInformationList();
+        this.downloadDir = md.createDownloadDir();
+        md.loadSharedFiles(this);
     }
 
     public int getPartSize() {
@@ -85,4 +86,8 @@ public class FileData {
 	public FileInformationList getFileList() {
         return fileList;
     }
+	
+	public void addFile(FileInformation fileInformation) {
+		fileList.add(fileInformation);
+	}
 }

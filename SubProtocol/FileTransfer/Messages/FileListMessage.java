@@ -94,6 +94,10 @@ public class FileListMessage extends SafeUnicastMessage {
 
 	@Override
 	public String toString() {
-		return super.toString() + "FileListMessage:";
+		String files = "";
+		for (FileInformation fileInformation : this.fileList.toArray()) {
+			files += " " + fileInformation.getName();
+		}
+		return super.toString() + "FileListMessage:" + files;
 	}
 }

@@ -61,6 +61,10 @@ public class FileTransferProtocol extends SubProtocol implements AddUserEventObs
 		timer = new Timer();
 	}
 
+	
+	public FileData getFileData() {
+		return fileData;
+	}
 
 	// Concurrent Event process
 

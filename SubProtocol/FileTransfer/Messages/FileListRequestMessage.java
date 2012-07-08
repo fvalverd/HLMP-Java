@@ -30,6 +30,6 @@ public class FileListRequestMessage extends SafeUnicastMessage {
 
 	@Override
 	public String toString() {
-		return super.toString() + "FileListRequestMessage:";
+		return super.toString() + "FileListRequestMessage";
 	}
 }

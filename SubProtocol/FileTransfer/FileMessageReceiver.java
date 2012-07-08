@@ -82,7 +82,7 @@ class FileMessageReceiver extends FileMessageHandler {
 			}
 
 			//crea e inicializa el archivo temporal
-			// TODO: paremetrizar el path del archivo
+			// TODO: Esto lo debe hacer el sistema operativo
 			boolean exists = true;
 			int j = 0;
 			while (exists) {
