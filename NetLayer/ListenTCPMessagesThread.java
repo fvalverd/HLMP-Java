@@ -36,10 +36,10 @@ public class ListenTCPMessagesThread extends Thread {
                 }
                 int size = BitConverter.byteArrayToInt(sizeLikeByte);
                 byte[] data = new byte[size];
-                totalReadBytes = nStream.read(data, 0, data.length);
-                while (totalReadBytes < data.length)
+                totalReadBytes = nStream.read(data, 0, size);
+                while (totalReadBytes < size)
                 {
-                	int currentReadBytes = nStream.read(sizeLikeByte, totalReadBytes, 4 - totalReadBytes); 
+                	int currentReadBytes = nStream.read(data, totalReadBytes, size - totalReadBytes); 
                 	if (currentReadBytes == -1) this.interrupt();
                     totalReadBytes += currentReadBytes;
                 }

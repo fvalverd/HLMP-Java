@@ -3,6 +3,7 @@ package hlmp.Tools;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.MappedByteBuffer;
 //import java.nio.charset.Charset;
 import java.util.UUID;
 
@@ -20,22 +21,18 @@ public class BitConverter {
 	}
 	
 	public static byte[] UUIDtoBytes(UUID id) {
-		byte[] bits = new byte[16];
-		long msb = id.getMostSignificantBits();
-		long lsb = id.getLeastSignificantBits();
-		
-		for (int i = 0; i < 8; i++) {
-			bits[i] = (byte) (msb >>> 8 * i);
-		}
-		for (int i = 8; i < 16; i++) {
-			bits[i] = (byte) (lsb >>> 8 * (i - 16));
-		}
-		
-		return bits;
+		ByteBuffer byteBuffer = MappedByteBuffer.allocate(16);
+		byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+		byteBuffer.putLong(id.getMostSignificantBits());
+		byteBuffer.putLong(id.getLeastSignificantBits());
+		return byteBuffer.array();
 	}
 	
 	public static UUID bytesToUUID(byte[] bits) {
-		return new UUID(readLong(bits, 0), readLong(bits, 8));
+		ByteBuffer bb = ByteBuffer.wrap(bits);
+		bb.order(ByteOrder.LITTLE_ENDIAN);
+		UUID uuid = new UUID(bb.getLong(), bb.getLong());
+		return uuid;
 	}
 
 	public static final int readInt(byte[] src, int offset) {
