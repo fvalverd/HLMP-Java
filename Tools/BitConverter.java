@@ -3,7 +3,6 @@ package hlmp.Tools;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.MappedByteBuffer;
 //import java.nio.charset.Charset;
 import java.util.UUID;
 
@@ -21,7 +20,7 @@ public class BitConverter {
 	}
 	
 	public static byte[] UUIDtoBytes(UUID id) {
-		ByteBuffer byteBuffer = MappedByteBuffer.allocate(16);
+		ByteBuffer byteBuffer = ByteBuffer.wrap(new byte[16]);
 		byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
 		byteBuffer.putLong(id.getMostSignificantBits());
 		byteBuffer.putLong(id.getLeastSignificantBits());
