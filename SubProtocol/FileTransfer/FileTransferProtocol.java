@@ -115,7 +115,7 @@ public class FileTransferProtocol extends SubProtocol implements AddUserEventObs
 				if (fileInformation != null) {
 					FileMessageSender fileMessageSender = new FileMessageSender(fileRequestMessage.getSenderNetUser(), fileRequestMessage.getFileHandlerId(), this, fileInformation, fileData);
 					synchronized (fileMessageHandlerLock) {
-						if (!activeUploads.contains(fileMessageSender.getId())) {
+						if (!activeUploads.containsKey(fileMessageSender.getId())) {
 							if (fileMessageUploadQueue.put(fileMessageSender)) {
 								controlFileHandler.uploadFileQueued(fileRequestMessage.getSenderNetUser(), fileMessageSender.getId().toString(), fileInformation.getName());
 							}
@@ -131,13 +131,13 @@ public class FileTransferProtocol extends SubProtocol implements AddUserEventObs
 			case FileTransferProtocolType.FILEERRORMESSAGES: {
 				FileErrorMessage fileErrorMessage = (FileErrorMessage)message;
 				synchronized (fileMessageHandlerLock) {
-					if (activeUploads.contains(fileErrorMessage.getFileHandlerId())) {
+					if (activeUploads.containsKey(fileErrorMessage.getFileHandlerId())) {
 						FileMessageHandler fileMessageHandler = activeUploads.get(fileErrorMessage.getFileHandlerId());
 						controlFileHandler.uploadFileFailed(fileMessageHandler.getId().toString());
 						fileMessageHandler.close();
 						activeUploads.remove(fileMessageHandler.getId());
 					}
-					else if (activeDownloads.contains(fileErrorMessage.getFileHandlerId())) {
+					else if (activeDownloads.containsKey(fileErrorMessage.getFileHandlerId())) {
 						FileMessageHandler fileMessageHandler = activeDownloads.get(fileErrorMessage.getFileHandlerId());
 						controlFileHandler.downloadFileFailed(fileMessageHandler.getId().toString());
 						fileMessageHandler.close();
@@ -149,7 +149,7 @@ public class FileTransferProtocol extends SubProtocol implements AddUserEventObs
 			case FileTransferProtocolType.FILEPARTMESSAGE: {
 				FilePartMessage filePartMessage = (FilePartMessage)message;
 				synchronized (fileMessageHandlerLock) {
-					if (activeDownloads.contains(filePartMessage.getFileHandlerId())) {
+					if (activeDownloads.containsKey(filePartMessage.getFileHandlerId())) {
 						FileMessageHandler fileMessageHandler = activeDownloads.get(filePartMessage.getFileHandlerId());
 						fileMessageHandler.attendMessage(filePartMessage);
 						fileMessageHandler.waitUp(fileData.getFileRiseUp());
@@ -164,11 +164,11 @@ public class FileTransferProtocol extends SubProtocol implements AddUserEventObs
 			case FileTransferProtocolType.FILEWAITMESSAGE: {
 				FileWaitMessage fileWaitMessage = (FileWaitMessage)message;
 				synchronized (fileMessageHandlerLock) {
-					if (activeDownloads.contains(fileWaitMessage.getFileHandlerId())) {
+					if (activeDownloads.containsKey(fileWaitMessage.getFileHandlerId())) {
 						FileMessageHandler fileMessageHandler = activeDownloads.get(fileWaitMessage.getFileHandlerId());
 						fileMessageHandler.waitUp(fileData.getFileRiseUp());
 					}
-					else if (activeUploads.contains(fileWaitMessage.getFileHandlerId())) {
+					else if (activeUploads.containsKey(fileWaitMessage.getFileHandlerId())) {
 						FileMessageHandler fileMessageHandler = activeUploads.get(fileWaitMessage.getFileHandlerId());
 						fileMessageHandler.waitUp(fileData.getFileRiseUp());
 					}
@@ -184,7 +184,7 @@ public class FileTransferProtocol extends SubProtocol implements AddUserEventObs
 			case FileTransferProtocolType.FILECOMPLETEMESSAGE: {
 				FileCompleteMessage fileCompleteMessage = (FileCompleteMessage)message;
 				synchronized (fileMessageHandlerLock) {
-					if (activeUploads.contains(fileCompleteMessage.getFileHandlerId())) {
+					if (activeUploads.containsKey(fileCompleteMessage.getFileHandlerId())) {
 						FileMessageHandler fileMessageHandler = activeUploads.get(fileCompleteMessage.getFileHandlerId());
 						fileMessageHandler.setState(FileMessageHandlerState.COMPLETED);
 					}
@@ -210,7 +210,7 @@ public class FileTransferProtocol extends SubProtocol implements AddUserEventObs
 			case FileTransferProtocolType.FILEREQUESTMESSAGE: {
 				FileRequestMessage fileRequestMessage = (FileRequestMessage)message;
 				synchronized (fileMessageHandlerLock) {
-					if (activeDownloads.contains(fileRequestMessage.getFileHandlerId()))
+					if (activeDownloads.containsKey(fileRequestMessage.getFileHandlerId()))
 					{
 						FileMessageHandler fileMessageHandler = activeDownloads.get(fileRequestMessage.getFileHandlerId());
 						controlFileHandler.downloadFileFailed(fileMessageHandler.getId().toString());
@@ -226,7 +226,7 @@ public class FileTransferProtocol extends SubProtocol implements AddUserEventObs
 			case FileTransferProtocolType.FILEPARTMESSAGE: {
 				FilePartMessage filePartMessage = (FilePartMessage)message;
 				synchronized (fileMessageHandlerLock) {
-					if (activeUploads.contains(filePartMessage.getFileHandlerId()))
+					if (activeUploads.containsKey(filePartMessage.getFileHandlerId()))
 					{
 						FileMessageHandler fileMessageHandler = activeUploads.get(filePartMessage.getFileHandlerId());
 						controlFileHandler.uploadFileFailed(fileMessageHandler.getId().toString());
@@ -239,14 +239,14 @@ public class FileTransferProtocol extends SubProtocol implements AddUserEventObs
 			case FileTransferProtocolType.FILEWAITMESSAGE: {
 				FileWaitMessage fileWaitMessage = (FileWaitMessage)message;
 				synchronized (fileMessageHandlerLock) {
-					if (activeDownloads.contains(fileWaitMessage.getFileHandlerId()))
+					if (activeDownloads.containsKey(fileWaitMessage.getFileHandlerId()))
 					{
 						FileMessageHandler fileMessageHandler = activeDownloads.get(fileWaitMessage.getFileHandlerId());
 						controlFileHandler.downloadFileFailed(fileMessageHandler.getId().toString());
 						fileMessageHandler.close();
 						activeDownloads.remove(fileMessageHandler.getId());
 					}
-					else if (activeUploads.contains(fileWaitMessage.getFileHandlerId()))
+					else if (activeUploads.containsKey(fileWaitMessage.getFileHandlerId()))
 					{
 						FileMessageHandler fileMessageHandler = activeUploads.get(fileWaitMessage.getFileHandlerId());
 						controlFileHandler.uploadFileFailed(fileMessageHandler.getId().toString());
