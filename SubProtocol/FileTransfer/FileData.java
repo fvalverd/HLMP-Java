@@ -11,6 +11,7 @@ public class FileData {
     private int timeIntervalTimer;
     private int simulteneusUpload;
     private int simulteneusDownload;
+    private String sharedDir;
     private String downloadDir;
     private FileInformationList fileList;
 
@@ -24,6 +25,7 @@ public class FileData {
         this.simulteneusDownload = 1;
         this.fileList = new FileInformationList();
         this.downloadDir = md.createDownloadDir();
+        this.sharedDir = md.createSharedDir();
         md.loadSharedFiles(this);
     }
 
@@ -33,6 +35,10 @@ public class FileData {
 
 	public void setPartSize(int partSize) {
 		this.partSize = partSize;
+	}
+	
+	public String getSharedDir() {
+		return sharedDir;
 	}
 	
 	public String getDownloadDir() {
