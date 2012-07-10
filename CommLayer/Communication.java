@@ -350,7 +350,7 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
 	 * Inicializa el timer
 	 */
 	private void timerStart(){
-		timer = new Timer();
+		timer = new Timer("Communication Timer");
 		timer.schedule(getCommunicationTimerTask(), 0, configuration.getNetData().getTimeIntervalTimer());
 	}
 	
@@ -358,7 +358,7 @@ public class Communication implements CommHandlerI, RouterMessageErrorHandlerI {
 	 * Inicializa el bag
 	 */
 	private void bagStart(){
-		bag = new Timer();
+		bag = new Timer("Bag Timer");
 		bag.schedule(getCommunicationBagTimerTask(), 0, configuration.getNetData().getTimeIntervalTimer());
 	}
 

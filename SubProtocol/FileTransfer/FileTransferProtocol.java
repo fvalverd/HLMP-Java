@@ -58,7 +58,7 @@ public class FileTransferProtocol extends SubProtocol implements AddUserEventObs
 		fileMessageHandlerLock = new Object();
 		timerPoint = new AtomicInteger(0);
 		fileMessageHandlerPoint = new AtomicInteger(0);
-		timer = new Timer();
+		timer = new Timer("FileTransferProtocol Timer");
 	}
 
 	
