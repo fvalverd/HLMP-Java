@@ -65,14 +65,11 @@ public class NetUser {
     /**
      * Default Constructor
      */
-    public NetUser()
-    {
-        try {
-			this.name = InetAddress.getLocalHost().getHostName();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			this.name = "undef";
-		}
+    public NetUser() {
+    	this.name = "undef";
+//        try {
+//			this.name = InetAddress.getLocalHost().getHostName();
+//		} catch (UnknownHostException e) {}
         this.signalQuality = NetUserQuality.NORMAL;
         this.neighborhoodIds = new UUID[0];
         this.jumpsAway = 0;
