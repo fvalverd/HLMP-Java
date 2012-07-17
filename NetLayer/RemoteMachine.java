@@ -145,8 +145,8 @@ public class RemoteMachine{
             }
             try
             {
-            	// TODO: FVALVERD parametrizar el 500
-            	tcpClient.setSoLinger(true, 500);
+            	// TODO: FVALVERD parametrizar el 500 y el 10
+            	tcpClient.setSoLinger(true, 10);
             	tcpClient.setSoTimeout(500);
                 tcpClient.close();
             }

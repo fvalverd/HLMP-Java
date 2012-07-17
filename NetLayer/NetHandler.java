@@ -257,17 +257,17 @@ public class NetHandler implements ResetIpHandler {
 	                int timeOutIpChange = 0;
 	                while (!connect) {
 	                    try {
-	                    	log("NETHANDLER: adhoc...");
+	                    	log("NETHANDLER: connect adhoc...");
 	                        wifiHandler.connect();
 	                        connect = true;
-	                        log("NETHANDLER: adhoc... OK");
+	                        log("NETHANDLER: connect adhoc... OK");
 	                    }
 	                    catch (Exception e) {
 	                    	e.printStackTrace();
-	                        log("NETHANDLER: adhoc... FAILED! " + e.getMessage());
+	                        log("NETHANDLER: connect adhoc... FAILED! " + e.getMessage());
 	                        timeOutIpChange++;
 	                        if (timeOutIpChange > netData.getWaitForStart()) {
-	                            throw new Exception("timeout, para configurar adhoc");
+	                            throw new Exception("timeout, adhoc can't start");
 	                        }
 	                        Thread.sleep(netData.getWaitTimeStart());
 	                    }
@@ -282,9 +282,10 @@ public class NetHandler implements ResetIpHandler {
 	                // Wait for connect
 	                while (wifiHandler.getConnectionState() != WifiConnectionState.CONNECTED) {
 	                	log("wifiHandler.state=" + wifiHandler.getConnectionState());
-	                	if (wifiHandler.getConnectionState() == WifiConnectionState.FAILED || wifiHandler.getConnectionState() == WifiConnectionState.STOP) {
+	                	if (wifiHandler.getConnectionState() == WifiConnectionState.FAILED ||
+	                			wifiHandler.getConnectionState() == WifiConnectionState.STOP) {
 	                		netHandlerState = NetHandlerState.STOPFORCED;
-	                		throw new Exception("AdHoc Failed");
+	                		throw new Exception("adhoc Failed!");
 	                	}
 	                	Thread.sleep(1000);
 	                	log("wifiHandler.state=" + wifiHandler.getConnectionState());
